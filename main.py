@@ -288,7 +288,8 @@ def valide_purchase(message, order_data, is_tashkent: bool):
 
     for admin in admin_id:
         order = f"""
-#order{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}_{str(order_data['item_video_url']).replace('https://www.ddinstagram.com/', '').split('/')[1].replace('_', '')}
+#order
+#{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}_{str(order_data['item_video_url']).replace('https://www.ddinstagram.com/', '').split('/')[1].replace('_', '')}
 <b>👤 Имя:</b> {str(order_data['name'])}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>  @{message.from_user.username}
 <b>📞 Номер:</b> {order_data['phone_number']}
