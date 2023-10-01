@@ -251,6 +251,10 @@ def get_bts_office(message, order_data): # works only for orders in regions
                 bot.send_message(developer_id, str(e))
             bot.send_message(message.from_user.id, "<b>✅ Всё верно?</b>\nПодтвердите ваш заказ нажав на кнопку ниже", parse_mode='html', reply_markup=confirmation_button())
             bot.register_next_step_handler(message, valide_purchase, order_data, False)
+            return
+    
+    ask_bts_office(message, order_data) # ask again if none from the list is choosen
+    
 
 
 def get_geolocation_tashkent(message, order_data): # works only for orders in Tashkent
