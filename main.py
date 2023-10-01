@@ -306,7 +306,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
         # markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
         # markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
 
-        r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
+        r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
         if is_tashkent:
             bot.send_location(admin, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r.message_id)
         
