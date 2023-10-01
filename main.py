@@ -4,7 +4,7 @@
 from flask import Flask, request
 
 import telebot
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 import re, os
 from datetime import datetime
@@ -293,7 +293,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
     for admin in admin_id:
         order = f"""
 #order
-#{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}_{str(order_data['item_video_url']).replace('https://www.ddinstagram.com/', '').split('/')[1].replace('_', '')}
+#orderid_{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}_{str(order_data['item_video_url']).replace('https://www.ddinstagram.com/', '').split('/')[1].replace('_', '')}
 <b>👤 Имя:</b> {str(order_data['name'])}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>  @{message.from_user.username}
 <b>📞 Номер:</b> {order_data['phone_number']}
@@ -301,12 +301,16 @@ def valide_purchase(message, order_data, is_tashkent: bool):
 <b>⌚️ Товар:</b> <a href='{order_data['item_video_url']}'>часы</a>"""
 
         # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
+        # markup = InlineKeyboardMarkup()
+        # markup.add(InlineKeyboardButton("Отправлено 🚚", callback_data="sent"))
+        # markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
+        # markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
+
+        r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
         if is_tashkent:
-            r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
             bot.send_location(admin, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r.message_id)
         
         else:
-            r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
             with open(f'bts-offices/{order_data["region"]}/{order_data["bts_office"]}', 'rb') as photo:
                 bot.send_photo(admin, photo=photo, caption=order_data["bts_office"].split('#')[0], reply_to_message_id=r.message_id, parse_mode='html')
 
@@ -314,6 +318,17 @@ def valide_purchase(message, order_data, is_tashkent: bool):
         # except Exception as e:
         #     print(e)
         #     bot.send_message(developer_id, str(e))
+
+
+# @bot.callback_query_handler(func=lambda call: True)
+# def callback_query(call):
+#     print(call.message.text)
+#     if call.data == 'sent':
+#         bot.edit_message_text(text=call.message.text + "\n\n🚚 Отправлено 🚚", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+#     elif call.data == 'delivered':
+#         bot.edit_message_text(text=call.message.text + "\n\n✅ Доставлено ✅", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+#     elif call.data == 'canceled':
+#         bot.edit_message_text(text=call.message.text + "\n\n❌ Отменено ❌", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
 
 
 @bot.message_handler(content_types=['text'])
@@ -329,5 +344,3 @@ def command_hello(message):
 
 print("bot has been started")
 bot.polling(none_stop=True)
-
-# luxurywatch@1234
