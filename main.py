@@ -207,8 +207,8 @@ def ask_bts_office(message, order_data): # works only for orders in regions
     try:
         for office in os.listdir(f'bts-offices/{order_data["region"]}'):
             with open(f'bts-offices/{order_data["region"]}/{office}', 'rb') as photo:
-                bot.send_photo(message.from_user.id, photo=photo, caption=office.split('#')[0], parse_mode='html')
-                bot.send_location(message.from_user.id, latitude=office.split('#')[1].replace('.jpg', '').split(',')[0], longitude=office.split('#')[1].replace('.jpg', '').split(',')[1])
+                r = bot.send_photo(message.from_user.id, photo=photo, caption=office.split('#')[0], parse_mode='html')
+                bot.send_location(message.from_user.id, latitude=office.split('#')[1].replace('.jpg', '').split(',')[0], longitude=office.split('#')[1].replace('.jpg', '').split(',')[1], reply_to_message_id=r.message_id)
             
         markup = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, one_time_keyboard=True)
         for office in os.listdir(f'bts-offices/{order_data["region"]}'):
