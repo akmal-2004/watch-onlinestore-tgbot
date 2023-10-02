@@ -205,13 +205,13 @@ def ask_bts_office(message, order_data): # works only for orders in regions
     if check_if_canceled(message, order_data): return
 
     try:
-        for office in os.listdir(f'bts-offices/{order_data["region"]}'):
-            with open(f'bts-offices/{order_data["region"]}/{office}', 'rb') as photo:
+        for office in os.listdir(f'{content_messages.bts_offices_path}{order_data["region"]}'):
+            with open(f'{content_messages.bts_offices_path}{order_data["region"]}/{office}', 'rb') as photo:
                 r = bot.send_photo(message.from_user.id, photo=photo, caption=office.split('#')[0], parse_mode='html')
                 bot.send_location(message.from_user.id, latitude=office.split('#')[1].replace('.jpg', '').split(',')[0], longitude=office.split('#')[1].replace('.jpg', '').split(',')[1], reply_to_message_id=r.message_id)
             
         markup = ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, one_time_keyboard=True)
-        for office in os.listdir(f'bts-offices/{order_data["region"]}'):
+        for office in os.listdir(f'{content_messages.bts_offices_path}{order_data["region"]}'):
             markup.add(office.split('#')[0])
         markup.add(content_messages.cannel_button)
 
@@ -227,7 +227,7 @@ def ask_bts_office(message, order_data): # works only for orders in regions
 def get_bts_office(message, order_data): # works only for orders in regions
     if check_if_canceled(message, order_data): return
 
-    for office in os.listdir(f'bts-offices/{order_data["region"]}'):
+    for office in os.listdir(f'{content_messages.bts_offices_path}{order_data["region"]}'):
         if message.text == office.split('#')[0]:
             order_data["bts_office"] = office
 
@@ -242,7 +242,7 @@ def get_bts_office(message, order_data): # works only for orders in regions
             # bot.send_video(message.from_user.id, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
             bot.send_message(message.from_user.id, order, disable_web_page_preview=False, parse_mode='html')
             try:
-                with open(f'bts-offices/{order_data["region"]}/{office}', 'rb') as photo:
+                with open(f'{content_messages.bts_offices_path}{order_data["region"]}/{office}', 'rb') as photo:
                     bot.send_photo(message.from_user.id, photo=photo, caption=office.split('#')[0], parse_mode='html')
                 bot.send_location(message.from_user.id, latitude=office.split('#')[1].replace('.jpg', '').split(',')[0], longitude=office.split('#')[1].replace('.jpg', '').split(',')[1])
             except Exception as e:
@@ -310,7 +310,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
             bot.send_location(admin, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r.message_id)
         
         else:
-            with open(f'bts-offices/{order_data["region"]}/{order_data["bts_office"]}', 'rb') as photo:
+            with open(f'{content_messages.bts_offices_path}{order_data["region"]}/{order_data["bts_office"]}', 'rb') as photo:
                 bot.send_photo(admin, photo=photo, caption=order_data["bts_office"].split('#')[0], reply_to_message_id=r.message_id, parse_mode='html')
 
         # try: os.remove(order_data['item_video'])

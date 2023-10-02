@@ -1,3 +1,5 @@
+import os
+
 greeting = '''
 <b>👋 Добро пожаловать в онлайн магазин luxurywatch_uz</b>
 
@@ -32,17 +34,19 @@ order_canceled = "<b>Заказ отменён ❌</b>"
 
 
 regions = [None] * 14
-regions[0] = 'Ташкент'
-regions[1] = 'Ташкентская область'
-regions[2] = 'Андижанская область'
-regions[3] = 'Бухарская область'
-regions[4] = 'Джизакская область'
-regions[5] = 'Кашкадарьинская область'
-regions[6] = 'Наманганская область'
-regions[7] = 'Навоийская область'
-regions[8] = 'Самаркандская область'
-regions[9] = 'Сурхандарьинская область'
-regions[10] = 'Сырдарьинская область'
-regions[11] = 'Ферганская область'
-regions[12] = 'Хорезмская область'
-regions[13] = 'Республика Каракалпакстан'
+regions[0] = 'Tashkent'
+regions[1] = 'Tashkent Region'
+regions[2] = 'Andijan Region'
+regions[3] = 'Bukhara Region'
+regions[4] = 'Jizzakh Region'
+regions[5] = 'Kashkadarya Region'
+regions[6] = 'Namangan Region'
+regions[7] = 'Navoiy Region'
+regions[8] = 'Samarkand Region'
+regions[9] = 'Surkhandarya Region'
+regions[10] = 'Syrdarya Region'
+regions[11] = 'Fergana Region'
+regions[12] = 'Khorezm Region'
+regions[13] = 'Republic of Karakalpakstan'
+
+bts_offices_path = os.path.abspath(".") + r"/bts-offices/"
