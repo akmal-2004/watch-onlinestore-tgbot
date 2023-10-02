@@ -1,4 +1,3 @@
-
 # A very simple Flask Hello World app for you to get started with...
 
 from flask import Flask, request
@@ -269,7 +268,7 @@ def get_geolocation_tashkent(message, order_data): # works only for orders in Ta
         bot.register_next_step_handler(message, get_geolocation_tashkent, order_data)
 
     else:
-        order_data["address"] = {"longitude": message.location.longitude, "latitude": message.location.latitude}
+        order_data["address"] = {"latitude": message.location.latitude, "longitude": message.location.longitude}
         bot.send_message(message.from_user.id, "<b>Ваш заказ:</b>", parse_mode='html')
 
         order = f"""
@@ -293,7 +292,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
     for admin in admin_id:
         order = f"""
 #order
-#orderid_{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}_{str(order_data['item_video_url']).replace('https://www.ddinstagram.com/', '').split('/')[1].replace('_', '')}
+#orderid_{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}
 <b>👤 Имя:</b> {str(order_data['name'])}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>  @{message.from_user.username}
 <b>📞 Номер:</b> {order_data['phone_number']}
@@ -344,3 +343,10 @@ def command_hello(message):
 
 print("bot has been started")
 bot.polling(none_stop=True)
+
+
+# {'item_video_url': 'https://www.ddinstagram.com/reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==', 'name': 'акмаль', 'phone_number': '123455783892', 'region': 'Ташкентская область', 'bts_office': 'Chirchiq BTS#41.474813,69.588587.jpg'}
+# {'item_video_url': 'https://www.ddinstagram.com/reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==', 'name': 'акмаль', 'phone_number': '234827493284', 'address': {'longitude': 69.588587, 'latitude': 41.474813}}
+
+# >>>123456789<>reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==<>акмаль<>123455783892<>region<>Ташкентская область<>Chirchiq BTS#41.474813,69.588587.jpg>>>
+# >>>123456789<>reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==<>акмаль<>123455783892<>address<>41.474813,69.588587>>>
