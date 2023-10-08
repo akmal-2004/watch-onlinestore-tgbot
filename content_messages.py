@@ -49,5 +49,5 @@ regions[11] = 'Fergana Region'
 regions[12] = 'Khorezm Region'
 regions[13] = 'Republic of Karakalpakstan'
 
-bts_offices_path = os.path.abspath(".") + r"/mysite/bts-offices/"
-# bts_offices_path = "bts-offices/"
+# bts_offices_path = os.path.abspath(".") + r"/mysite/bts-offices/"
+bts_offices_path = "bts-offices/"

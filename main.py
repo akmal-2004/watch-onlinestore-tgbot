@@ -379,15 +379,38 @@ def callback_query(call):
         bot.answer_callback_query(call.id, text='Доставлено ✅')
         order = f"""
 #order
-#{call.message.text.split('#')[2].split('>>>')[0]}
+#{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+
+<b>👤 Имя:</b> {order_data_decoded[0]}
+<b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
+<b>📞 Номер:</b> {order_data_decoded[3]}
+<b>📍 Адрес:</b> {order_data_decoded[5]}
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
+
 <i>✅ Доставлено</i>"""
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
         
         for admin in admin_id:
             bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
 
 
-    # elif call.data == 'canceled':
-    #     bot.edit_message_text(text=call.message.text + "\n\n❌ Отменено ❌", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+    elif call.data == 'canceled':
+        bot.answer_callback_query(call.id, text='Отменено ❌')
+        order = f"""
+#order
+#{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+
+<b>👤 Имя:</b> {order_data_decoded[0]}
+<b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
+<b>📞 Номер:</b> {order_data_decoded[3]}
+<b>📍 Адрес:</b> {order_data_decoded[5]}
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
+
+<i>❌ Отменено</i>"""
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+        
+        for admin in admin_id:
+            bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
 
 
 @bot.message_handler(content_types=['text'])
