@@ -236,7 +236,7 @@ def get_bts_office(message, order_data): # works only for orders in regions
             order = f"""
 <b>👤 Имя:</b> {order_data['name']}
 <b>📞 Номер:</b> {order_data['phone_number']}
-<b>📍 Адресс:</b> {office.split('#')[0]}
+<b>📍 Адрес:</b> {office.split('#')[0]}
 <b>⌚️ Товар:</b> <a href='{order_data['item_video_url']}'>часы</a>"""
 
             # bot.send_video(message.from_user.id, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
@@ -274,7 +274,7 @@ def get_geolocation_tashkent(message, order_data): # works only for orders in Ta
         order = f"""
 <b>👤 Имя:</b> {order_data['name']}
 <b>📞 Номер:</b> {order_data['phone_number']}
-<b>📍 Адресс:</b> локация
+<b>📍 Адрес:</b> локация
 <b>⌚️ Товар:</b> <a href='{order_data['item_video_url']}'>часы</a>"""
 
         # bot.send_video(message.from_user.id, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
@@ -306,7 +306,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
 <b>👤 Имя:</b> {str(order_data['name'])}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={message.from_user.id}'>{str(order_data['name'])}</a>  @{message.from_user.username}
 <b>📞 Номер:</b> {order_data['phone_number']}
-<b>📍 Адресс:</b> {order_data['bts_office'].split('#')[0] if 'bts_office' in order_data else f'{order_data["address"]["latitude"]},{order_data["address"]["longitude"]}'}
+<b>📍 Адрес:</b> {order_data['bts_office'].split('#')[0] if 'bts_office' in order_data else f'{order_data["address"]["latitude"]},{order_data["address"]["longitude"]}'}
 <b>⌚️ Товар:</b> <a href='{order_data['item_video_url']}'>часы</a>"""
 
 
@@ -347,7 +347,7 @@ def callback_query(call):
 <b>👤 Имя:</b> {order_data_decoded[0]}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
 <b>📞 Номер:</b> {order_data_decoded[3]}
-<b>📍 Адресс:</b> {order_data_decoded[6].split('#')[0]}
+<b>📍 Адрес:</b> {order_data_decoded[6].split('#')[0]}
 <b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[7]}'>часы</a>
 
 <i>📦 Отправлено в BTS</i>"""
@@ -363,14 +363,24 @@ def callback_query(call):
 <b>👤 Имя:</b> {order_data_decoded[0]}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
 <b>📞 Номер:</b> {order_data_decoded[3]}
-<b>📍 Адресс:</b> {order_data_decoded[5]}
+<b>📍 Адрес:</b> {order_data_decoded[5]}
 <b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
 
 <i>🚗 Отправлено курьеру</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
 
-    # elif call.data == 'delivered':
-    #     bot.edit_message_text(text=call.message.text + "\n\n✅ Доставлено ✅", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+
+    elif call.data == 'delivered':
+        bot.answer_callback_query(call.id, text='Доставлено ✅')
+        order = f"""
+#order
+#{call.message.text.split('#')[2].split('>>>')[0]}
+<i>✅ Доставлено</i>"""
+        
+        for admin in admin_id:
+            bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+
+
     # elif call.data == 'canceled':
     #     bot.edit_message_text(text=call.message.text + "\n\n❌ Отменено ❌", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
 

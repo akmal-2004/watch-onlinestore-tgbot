@@ -27,8 +27,8 @@ https://www.instagram.com/reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet
 make_order_button = "Сделать заказ 🛒"
 info_button = "Информация про магазин ℹ️"
 
-yes_button = "да"
-cannel_button = "отменить заказ"
+yes_button = "Да"
+cannel_button = "Отменить заказ"
 
 order_canceled = "<b>Заказ отменён ❌</b>"
 
