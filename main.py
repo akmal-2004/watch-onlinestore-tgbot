@@ -310,13 +310,14 @@ def valide_purchase(message, order_data, is_tashkent: bool):
 <b>⌚️ Товар:</b> <a href='{order_data['item_video_url']}'>часы</a>"""
 
 
+    markup = InlineKeyboardMarkup()
+    if not is_tashkent: markup.add(InlineKeyboardButton("Отправить в BTS 📦", callback_data="send_to_bts"))
+    if is_tashkent: markup.add(InlineKeyboardButton("Отправить курьеру 🚗", callback_data="send_to_deliveryman"))
+    markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
+    markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
+
     for admin in admin_id:
         # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
-        markup = InlineKeyboardMarkup()
-        if not is_tashkent: markup.add(InlineKeyboardButton("Отправить в BTS 📦", callback_data="send_to_bts"))
-        if is_tashkent: markup.add(InlineKeyboardButton("Отправить курьеру 🚗", callback_data="send_to_deliveryman"))
-        markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
-        markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
 
         r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
         if is_tashkent:
@@ -337,6 +338,10 @@ def callback_query(call):
     order_data_decoded = call.message.text.split('>>>')[1].split('`^`')
     print(order_data_decoded)
 
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
+    markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
+
 
     if call.data == 'send_to_bts':
         bot.answer_callback_query(call.id, text='Отправлено в BTS 📦')
@@ -351,7 +356,7 @@ def callback_query(call):
 <b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[7]}'>часы</a>
 
 <i>📦 Отправлено в BTS</i>"""
-        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
 
 
     if call.data == 'send_to_deliveryman':
@@ -367,7 +372,7 @@ def callback_query(call):
 <b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
 
 <i>🚗 Отправлено курьеру</i>"""
-        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
 
 
     elif call.data == 'delivered':
