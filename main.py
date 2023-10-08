@@ -289,23 +289,36 @@ def valide_purchase(message, order_data, is_tashkent: bool):
 
     bot.send_message(message.from_user.id, "<b>Спасибо за ваш заказ! 🙏</b>\nАдминистратор скоро свяжется с вами!", parse_mode='html', reply_markup=main_menu_buttons())
 
-    for admin in admin_id:
-        order = f"""
+    if is_tashkent:
+        # {'item_video_url': 'reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==', 'name': 'акмаль', 'phone_number': '234827493284', 'address': {'latitude': 41.474813, 'longitude': 69.588587,}}
+        order_data_encoded = f">>>{order_data['name']}`^`{message.from_user.id}`^`{message.from_user.username}`^`{order_data['phone_number']}`^`address`^`{order_data['address']['latitude']},{order_data['address']['longitude']}`^`{order_data['item_video_url'].replace('https://www.ddinstagram.com/', '')}>>>"
+    else:
+        # {'item_video_url': 'reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==', 'name': 'акмаль', 'phone_number': '123455783892', 'region': 'Ташкентская область', 'bts_office': 'Chirchiq BTS#41.474813,69.588587.jpg'}
+        order_data_encoded = f">>>{order_data['name']}`^`{message.from_user.id}`^`{message.from_user.username}`^`{order_data['phone_number']}`^`region`^`{order_data['region']}`^`{order_data['bts_office']}`^`{order_data['item_video_url'].replace('https://www.ddinstagram.com/', '')}>>>"
+        
+
+    order = f"""
 #order
-#id_{str(message.from_user.id)}_{str(datetime.now().strftime("%d%m%Y_%H%M%S"))}
+#id_{message.from_user.id}_{datetime.now().strftime("%d%m%Y_%H%M%S")}
+
+{order_data_encoded}
+
 <b>👤 Имя:</b> {str(order_data['name'])}
-<b>🆔 Телеграм:</b> <a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>  @{message.from_user.username}
+<b>🆔 Телеграм:</b> <a href='tg://user?id={message.from_user.id}'>{str(order_data['name'])}</a>  @{message.from_user.username}
 <b>📞 Номер:</b> {order_data['phone_number']}
 <b>📍 Адресс:</b> {order_data['bts_office'].split('#')[0] if 'bts_office' in order_data else f'{order_data["address"]["latitude"]},{order_data["address"]["longitude"]}'}
 <b>⌚️ Товар:</b> <a href='{order_data['item_video_url']}'>часы</a>"""
 
-        # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
-        # markup = InlineKeyboardMarkup()
-        # markup.add(InlineKeyboardButton("Отправлено 🚚", callback_data="sent"))
-        # markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
-        # markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
 
-        r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+    for admin in admin_id:
+        # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
+        markup = InlineKeyboardMarkup()
+        if not is_tashkent: markup.add(InlineKeyboardButton("Отправить в BTS 📦", callback_data="send_to_bts"))
+        if is_tashkent: markup.add(InlineKeyboardButton("Отправить курьеру 🚗", callback_data="send_to_deliveryman"))
+        markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
+        markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
+
+        r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
         if is_tashkent:
             bot.send_location(admin, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r.message_id)
         
@@ -319,15 +332,33 @@ def valide_purchase(message, order_data, is_tashkent: bool):
         #     bot.send_message(developer_id, str(e))
 
 
-# @bot.callback_query_handler(func=lambda call: True)
-# def callback_query(call):
-#     print(call.message.text)
-#     if call.data == 'sent':
-#         bot.edit_message_text(text=call.message.text + "\n\n🚚 Отправлено 🚚", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
-#     elif call.data == 'delivered':
-#         bot.edit_message_text(text=call.message.text + "\n\n✅ Доставлено ✅", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
-#     elif call.data == 'canceled':
-#         bot.edit_message_text(text=call.message.text + "\n\n❌ Отменено ❌", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    order_data_decoded = call.message.text.split('>>>')[1].split('`^`')
+
+    if call.data == 'send_to_bts':
+        print(call.message.text.split('#')[2].split('>>>')[0])
+        bot.answer_callback_query(call.id, text='Отправлено в BTS 📦')
+        order = f"""
+#order
+#id_{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+
+<b>👤 Имя:</b> {order_data_decoded[0]}
+<b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
+<b>📞 Номер:</b> {order_data_decoded[3]}
+<b>📍 Адресс:</b> {order_data_decoded[6].split('#')[0]}
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[7]}'>часы</a>
+
+<i>📦 Отправлено в BTS</i>"""
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+
+
+    # if call.data == 'send':
+    #     bot.edit_message_text(text=call.message.text + "\n\n🚚 Отправлено 🚚", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+    # elif call.data == 'delivered':
+    #     bot.edit_message_text(text=call.message.text + "\n\n✅ Доставлено ✅", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+    # elif call.data == 'canceled':
+    #     bot.edit_message_text(text=call.message.text + "\n\n❌ Отменено ❌", chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
 
 
 @bot.message_handler(content_types=['text'])
@@ -343,10 +374,3 @@ def command_hello(message):
 
 print("bot has been started")
 bot.polling(none_stop=True)
-
-
-# {'item_video_url': 'https://www.ddinstagram.com/reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==', 'name': 'акмаль', 'phone_number': '123455783892', 'region': 'Ташкентская область', 'bts_office': 'Chirchiq BTS#41.474813,69.588587.jpg'}
-# {'item_video_url': 'https://www.ddinstagram.com/reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==', 'name': 'акмаль', 'phone_number': '234827493284', 'address': {'longitude': 69.588587, 'latitude': 41.474813}}
-
-# >>>123456789<>reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==<>акмаль<>123455783892<>region<>Ташкентская область<>Chirchiq BTS#41.474813,69.588587.jpg>>>
-# >>>123456789<>reel/CxDFNaksQ6a/?utm_source=ig_web_button_share_sheet&igshid=MzRlODBiNWFlZA==<>акмаль<>123455783892<>address<>41.474813,69.588587>>>
