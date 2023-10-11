@@ -179,7 +179,7 @@ def get_region(message, order_data):
         keyboard.add(KeyboardButton(text="Отправить своё местоположение 📍", request_location=True))
         keyboard.add(content_messages.cannel_button)
 
-        bot.send_message(message.from_user.id, "<b>📍 Отправьте локацию:</b>", parse_mode='html', reply_markup=keyboard)
+        bot.send_message(message.from_user.id, "<i>ℹ️ Доставка по городу Ташкента. Наш курьер доставит ваш заказ в течении дня. Оплата после получения товара.\n\n</i><b>📍 Отправьте локацию:</b>", parse_mode='html', reply_markup=keyboard)
         bot.register_next_step_handler(message, get_geolocation_tashkent, order_data)
 
     elif message.text in content_messages.regions:
@@ -216,7 +216,7 @@ def ask_bts_office(message, order_data): # works only for orders in regions
             markup.add(office.split('#')[0])
         markup.add(content_messages.cannel_button)
 
-        bot.send_message(message.from_user.id, "<b>📦 Выберите оффис BTS-Express где вы хотите получить ваш заказ:</b>", parse_mode='html', reply_markup=markup)
+        bot.send_message(message.from_user.id, "<i>ℹ️ Доставка по области осуществляется через нашего партнера BTS express. Заказ будет доставлен до офиса почты BTS. Оплата после получения товара.</i>\n\n<b>📦 Выберите оффис BTS-Express где вы хотите получить ваш заказ:</b>", parse_mode='html', reply_markup=markup)
         bot.register_next_step_handler(message, get_bts_office, order_data)
     except Exception as e:
             print(e)
