@@ -20,6 +20,7 @@ bot.remove_webhook()
 
 developer_id = config.developer_id
 admin_id = config.admin_id
+deliveryman = config.deliveryman
 
 
 # app = Flask(__name__)
@@ -372,7 +373,7 @@ def callback_query(call):
 
 <i>🚗 Отправлено курьеру</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
-        bot.send_message(1785670090, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
+        bot.send_message(deliveryman, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
 
 
     elif call.data == 'delivered':
