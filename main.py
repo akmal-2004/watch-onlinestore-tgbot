@@ -336,7 +336,6 @@ def valide_purchase(message, order_data, is_tashkent: bool):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     order_data_decoded = call.message.text.split('>>>')[1].split('`^`')
-    print(order_data_decoded)
 
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
@@ -373,6 +372,7 @@ def callback_query(call):
 
 <i>🚗 Отправлено курьеру</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
+        bot.send_message(1785670090, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
 
 
     elif call.data == 'delivered':
