@@ -1,5 +1,3 @@
-# A very simple Flask Hello World app for you to get started with...
-
 from flask import Flask, request
 
 import telebot
@@ -19,7 +17,7 @@ bot.remove_webhook()
 # bot.set_webhook(url=config.set_webhook.format(secret))
 
 developer_id = config.developer_id
-admin_id = config.admin_id
+admin_id = config.admin_id # list (array)
 deliveryman = config.deliveryman
 
 
@@ -179,7 +177,7 @@ def get_region(message, order_data):
         keyboard.add(KeyboardButton(text="Отправить своё местоположение 📍", request_location=True))
         keyboard.add(content_messages.cannel_button)
 
-        bot.send_message(message.from_user.id, "<i>ℹ️ Доставка по городу Ташкента. Наш курьер доставит ваш заказ в течении дня. Оплата после получения товара.\n\n</i><b>📍 Отправьте локацию:</b>", parse_mode='html', reply_markup=keyboard)
+        bot.send_message(message.from_user.id, "<i>ℹ️ Бесплатная доставка по городу Ташкента. Наш курьер доставит ваш заказ в течении дня. Оплата после получения товара.\n\n</i><b>📍 Отправьте локацию:</b>", parse_mode='html', reply_markup=keyboard)
         bot.register_next_step_handler(message, get_geolocation_tashkent, order_data)
 
     elif message.text in content_messages.regions:
@@ -216,7 +214,7 @@ def ask_bts_office(message, order_data): # works only for orders in regions
             markup.add(office.split('#')[0])
         markup.add(content_messages.cannel_button)
 
-        bot.send_message(message.from_user.id, "<i>ℹ️ Доставка по области осуществляется через нашего партнера BTS express. Заказ будет доставлен до офиса почты BTS. Оплата после получения товара.</i>\n\n<b>📦 Выберите оффис BTS-Express где вы хотите получить ваш заказ:</b>", parse_mode='html', reply_markup=markup)
+        bot.send_message(message.from_user.id, "<i>ℹ️ Бесплатная доставка по области осуществляется через нашего партнера BTS express. Заказ будет доставлен до офиса почты BTS. Оплата после получения товара.</i>\n\n<b>📦 Выберите оффис BTS-Express где вы хотите получить ваш заказ:</b>", parse_mode='html', reply_markup=markup)
         bot.register_next_step_handler(message, get_bts_office, order_data)
     except Exception as e:
             print(e)
@@ -299,8 +297,8 @@ def valide_purchase(message, order_data, is_tashkent: bool):
         
 
     order = f"""
-#order
-#id_{message.from_user.id}_{datetime.now().strftime("%d%m%Y_%H%M%S")}
+#order #neworder
+#id{message.from_user.id}{datetime.now().strftime("%d%m%Y%H%M%S")}
 
 {order_data_encoded}
 
@@ -346,14 +344,14 @@ def callback_query(call):
     if call.data == 'send_to_bts':
         bot.answer_callback_query(call.id, text='Отправлено в BTS 📦')
         order = f"""
-#order
-#{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+#order #bts
+#{call.message.text.split('#')[3].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
 
 <b>👤 Имя:</b> {order_data_decoded[0]}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
 <b>📞 Номер:</b> {order_data_decoded[3]}
 <b>📍 Адрес:</b> {order_data_decoded[6].split('#')[0]}
-<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[7]}'>часы</a>
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[-1]}'>часы</a>
 
 <i>📦 Отправлено в BTS</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
@@ -362,31 +360,32 @@ def callback_query(call):
     if call.data == 'send_to_deliveryman':
         bot.answer_callback_query(call.id, text='Отправлено курьеру 🚗')
         order = f"""
-#order
-#{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+#order #
+#{call.message.text.split('#')[3].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
 
 <b>👤 Имя:</b> {order_data_decoded[0]}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
 <b>📞 Номер:</b> {order_data_decoded[3]}
 <b>📍 Адрес:</b> {order_data_decoded[5]}
-<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[-1]}'>часы</a>
 
 <i>🚗 Отправлено курьеру</i>"""
-        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
-        bot.send_message(deliveryman, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+        r = bot.send_message(deliveryman, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
+        bot.send_location(deliveryman, latitude=order_data_decoded[5].split(',')[0], longitude=order_data_decoded[5].split(',')[1], reply_to_message_id=r.message_id)
 
 
     elif call.data == 'delivered':
         bot.answer_callback_query(call.id, text='Доставлено ✅')
         order = f"""
-#order
-#{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+#order #delivered
+#{call.message.text.split('#')[3].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
 
 <b>👤 Имя:</b> {order_data_decoded[0]}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
 <b>📞 Номер:</b> {order_data_decoded[3]}
 <b>📍 Адрес:</b> {order_data_decoded[5]}
-<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[-1]}'>часы</a>
 
 <i>✅ Доставлено</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
@@ -398,14 +397,14 @@ def callback_query(call):
     elif call.data == 'canceled':
         bot.answer_callback_query(call.id, text='Отменено ❌')
         order = f"""
-#order
-#{call.message.text.split('#')[2].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+#order #canceled
+#{call.message.text.split('#')[3].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
 
 <b>👤 Имя:</b> {order_data_decoded[0]}
 <b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
 <b>📞 Номер:</b> {order_data_decoded[3]}
 <b>📍 Адрес:</b> {order_data_decoded[5]}
-<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[6]}'>часы</a>
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[-1]}'>часы</a>
 
 <i>❌ Отменено</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
