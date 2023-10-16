@@ -17,7 +17,7 @@ bot.remove_webhook()
 # bot.set_webhook(url=config.set_webhook.format(secret))
 
 developer_id = config.developer_id
-admin_id = config.admin_id # list (array)
+admin_id = config.admin_id
 deliveryman = config.deliveryman
 
 
@@ -316,21 +316,22 @@ def valide_purchase(message, order_data, is_tashkent: bool):
     markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
     markup.add(InlineKeyboardButton("Нет в наличии 📭", callback_data="not_available"))
 
-    for admin in admin_id:
-        # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
+    # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
 
-        r = bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
-        if is_tashkent:
-            bot.send_location(admin, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r.message_id)
-        
-        else:
-            with open(f'{content_messages.bts_offices_path}{order_data["region"]}/{order_data["bts_office"]}', 'rb') as photo:
-                bot.send_photo(admin, photo=photo, caption=order_data["bts_office"].split('#')[0], reply_to_message_id=r.message_id, parse_mode='html')
+    r_admin = bot.send_message(admin_id, order, disable_web_page_preview=False, parse_mode='html', reply_markup=markup)
+    r_dev = bot.send_message(developer_id, order, disable_web_page_preview=False, parse_mode='html')
+    if is_tashkent:
+        bot.send_location(admin_id, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r_admin.message_id)
+        bot.send_location(developer_id, latitude=order_data['address']['latitude'], longitude=order_data['address']['longitude'], reply_to_message_id=r_dev.message_id)
+    
+    else:
+        with open(f'{content_messages.bts_offices_path}{order_data["region"]}/{order_data["bts_office"]}', 'rb') as photo:
+            bot.send_photo(admin_id, photo=photo, caption=order_data["bts_office"].split('#')[0], reply_to_message_id=r.message_id, parse_mode='html')
 
-        # try: os.remove(order_data['item_video'])
-        # except Exception as e:
-        #     print(e)
-        #     bot.send_message(developer_id, str(e))
+    # try: os.remove(order_data['item_video'])
+    # except Exception as e:
+    #     print(e)
+    #     bot.send_message(developer_id, str(e))
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -392,8 +393,8 @@ def callback_query(call):
 <i>✅ Доставлено</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
         
-        for admin in admin_id:
-            bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(admin_id, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(developer_id, order, disable_web_page_preview=False, parse_mode='html')
 
 
     elif call.data == 'canceled':
@@ -411,8 +412,8 @@ def callback_query(call):
 <i>❌ Отменено</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
         
-        for admin in admin_id:
-            bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(developer_id, order, disable_web_page_preview=False, parse_mode='html')
 
     
     elif call.data == 'not_available':
@@ -430,8 +431,8 @@ def callback_query(call):
 <i>📭 Нет в наличии</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
         
-        for admin in admin_id:
-            bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(admin_id, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(developer_id, order, disable_web_page_preview=False, parse_mode='html')
 
 
 @bot.message_handler(content_types=['text'])
