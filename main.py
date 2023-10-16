@@ -314,6 +314,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
     if is_tashkent: markup.add(InlineKeyboardButton("Отправить курьеру 🚗", callback_data="send_to_deliveryman"))
     markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
     markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
+    markup.add(InlineKeyboardButton("Нет в наличии 📭", callback_data="not_available"))
 
     for admin in admin_id:
         # bot.send_video(admin, open(order_data['item_video'], 'rb'), caption=order, parse_mode='html')
@@ -339,6 +340,7 @@ def callback_query(call):
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Доставлено ✅", callback_data="delivered"))
     markup.add(InlineKeyboardButton("Отменено ❌", callback_data="canceled"))
+    markup.add(InlineKeyboardButton("Нет в наличии 📭", callback_data="not_available"))
 
 
     if call.data == 'send_to_bts':
@@ -407,6 +409,25 @@ def callback_query(call):
 <b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[-1]}'>часы</a>
 
 <i>❌ Отменено</i>"""
+        bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
+        
+        for admin in admin_id:
+            bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+
+    
+    elif call.data == 'not_available':
+        bot.answer_callback_query(call.id, text='Нет в наличии 📭')
+        order = f"""
+#order #notavailable
+#{call.message.text.split('#')[3].split('>>>')[0]}>>>{call.message.text.split('>>>')[1]}>>>
+
+<b>👤 Имя:</b> {order_data_decoded[0]}
+<b>🆔 Телеграм:</b> <a href='tg://user?id={order_data_decoded[1]}'>{order_data_decoded[0]}</a>  @{order_data_decoded[2]}
+<b>📞 Номер:</b> {order_data_decoded[3]}
+<b>📍 Адрес:</b> {order_data_decoded[5]}
+<b>⌚️ Товар:</b> <a href='https://www.ddinstagram.com/{order_data_decoded[-1]}'>часы</a>
+
+<i>📭 Нет в наличии</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
         
         for admin in admin_id:
