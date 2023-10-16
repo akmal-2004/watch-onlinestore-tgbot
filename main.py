@@ -326,7 +326,7 @@ def valide_purchase(message, order_data, is_tashkent: bool):
     
     else:
         with open(f'{content_messages.bts_offices_path}{order_data["region"]}/{order_data["bts_office"]}', 'rb') as photo:
-            bot.send_photo(admin_id, photo=photo, caption=order_data["bts_office"].split('#')[0], reply_to_message_id=r.message_id, parse_mode='html')
+            bot.send_photo(admin_id, photo=photo, caption=order_data["bts_office"].split('#')[0], reply_to_message_id=r_admin.message_id, parse_mode='html')
 
     # try: os.remove(order_data['item_video'])
     # except Exception as e:
@@ -412,7 +412,7 @@ def callback_query(call):
 <i>❌ Отменено</i>"""
         bot.edit_message_text(text=order, chat_id=call.message.chat.id, message_id=call.message.message_id, disable_web_page_preview=False, parse_mode='html')
         
-        bot.send_message(admin, order, disable_web_page_preview=False, parse_mode='html')
+        bot.send_message(admin_id, order, disable_web_page_preview=False, parse_mode='html')
         bot.send_message(developer_id, order, disable_web_page_preview=False, parse_mode='html')
 
     
