@@ -439,7 +439,10 @@ def callback_query(call):
 @bot.message_handler(commands=['start', 'help'])
 def command_hello(message):
     if message.chat.type == "private":
-        try: bot.send_message(message.from_user.id, content_messages.greeting, parse_mode='html', reply_markup=main_menu_buttons())
+        try:
+            bot.send_message(message.from_user.id, content_messages.greeting, parse_mode='html', reply_markup=main_menu_buttons())
+            bot.send_message(developer_id, f"#newuser <a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>  @{message.from_user.username}", parse_mode='html')
+
         except Exception as e:
             print(e)
             bot.send_message(developer_id, str(e))
